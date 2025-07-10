@@ -1,0 +1,18 @@
+CRITICAL REENTRANCY VULNERABILITY IN VAULT.SOL
+
+Vulnerability:
+- Function: withdraw()
+- Issue: External call before state update enables reentrancy.
+- Impact: 100% of ETH can be stolen.
+
+Reproduction Steps:
+1. Deploy Vault.sol and fund it with ETH.
+2. Deploy Attack.sol with Vault's address.
+3. Call attack() with 1 ETH.
+4. Attacker's receive() will recursively drain funds.
+
+Fix:
+Add a reentrancy guard:
+1. bool private locked;
+2. require(!locked, "Reentrancy detected");
+3. locked = true before external calls.
